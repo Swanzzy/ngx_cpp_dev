@@ -30,9 +30,14 @@ public:
         return get()->connection;
     }
 public:
-    void close() const
+    void close(ngx_uint_t rc = NGX_STREAM_OK) const
     {
+#if nginx_version >= 1011004
+        ngx_stream_finalize_session(get(), rc);
+#else
+        boost::ignore_unused(rc);
         ngx_stream_close_connection(connection());
+#endif
     }
 };
 
