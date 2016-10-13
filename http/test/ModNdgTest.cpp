@@ -11,7 +11,7 @@ auto ndg_test_module = NdgTestInit::module();
 
 struct NdgTestConf final
 {
-    ngx_flag_t enabled = NgxUnsetValue::get();
+    ngx_flag_t enabled = ngx_nil;
 };
 
 static void *create(ngx_conf_t* cf);

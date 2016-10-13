@@ -13,7 +13,7 @@ public:
     NdgTestConf() = default;
     ~NdgTestConf() = default;
 public:
-    ngx_flag_t enabled = NgxUnsetValue::get();
+    ngx_flag_t enabled = ngx_nil;
 public:
     static void* create(ngx_conf_t* cf)
     {
