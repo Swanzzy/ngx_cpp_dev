@@ -1,8 +1,8 @@
 // Copyright (c) 2015
 // Author: Chrono Law
-#include "NdgTestInit.hpp"
+//#include "NdgTestInit.hpp"
 
-auto ndg_test_module = NdgTestInit::module();
+//auto ndg_test_module = NdgTestInit::module();
 
 #include <iostream>
 
@@ -48,20 +48,20 @@ static ngx_http_module_t ndg_test_ctx =
     nullptr,//merge
 };
 
-ngx_module_t ndg_test_module =
+ngx_module_t ndg_test_module =                   // 模块定义,注意不是static
 {
-    NGX_MODULE_V1,
-    &ndg_test_ctx,
-    ndg_test_cmds,
-    NGX_HTTP_MODULE,
-    nullptr,                                  // init master
-    nullptr,                                  // init module
-    nullptr,                                  // init process
-    nullptr,                                  // init thread
-    nullptr,                                  // exit thread
-    nullptr,                                  // exit process
-    nullptr,                                  // exit master
-    NGX_MODULE_V1_PADDING
+    NGX_MODULE_V1,                               // 标准的填充宏 
+    &ndg_test_ctx,                               // 配置功能函数 
+    ndg_test_cmds,                               // 配置指令数组
+    NGX_HTTP_MODULE,                             // http模块必须的tag
+    nullptr,                                     // init master
+    nullptr,                                     // init module
+    nullptr,                                     // init process
+    nullptr,                                     // init thread
+    nullptr,                                     // exit thread
+    nullptr,                                     // exit process
+    nullptr,                                     // exit master
+    NGX_MODULE_V1_PADDING                        // 标准的填充宏 
 };
 
 /* *
@@ -85,36 +85,39 @@ static char *merge(ngx_conf_t *cf, void *parent, void *child)
     return NGX_CONF_OK;
 }
 
+// 注册处理函数
 static ngx_int_t init(ngx_conf_t* cf)
 {
     auto cmcf = reinterpret_cast<ngx_http_core_main_conf_t*>(
-        ngx_http_conf_get_module_main_conf(cf, ngx_http_core_module));
+        ngx_http_conf_get_module_main_conf(             // 获取函数
+            cf, ngx_http_core_module));                 // 使用的函数
 
-    NgxArray<ngx_http_handler_pt> arr(
-        cmcf->phases[NGX_HTTP_REWRITE_PHASE].handlers);
+    NgxArray<ngx_http_handler_pt> arr(                  // Nginx数组
+        cmcf->phases[NGX_HTTP_REWRITE_PHASE].handlers); // 该阶段的handler
 
-    arr.push(handler);
+    arr.push(handler);                                  // 加入自己的handler
 
-    return NGX_OK;
+    return NGX_OK;                                      // 执行成功
 }
 
+// 处理函数
 static ngx_int_t handler(ngx_http_request_t *r)
 {
-    auto cf = reinterpret_cast<NdgTestConf*>(
+    auto cf = reinterpret_cast<NdgTestConf*>(       // 获取配置数据
         ngx_http_get_module_loc_conf(r, ndg_test_module));
 
-    NgxLogError(r).print("hello c++");
+    NgxLogError(r).print("hello c++");              // 记录运行日志
 
-    if (cf->enabled)
+    if (cf->enabled)                                // 检查配置参数
     {
-        std::cout << "hello nginx" << std::endl;
+        std::cout << "hello nginx" << std::endl;    // 输出字符串
     }
     else
     {
-        std::cout << "hello disabled" << std::endl;
+        std::cout << "hello disabled" << std::endl; // 输出字符串
     }
 
 
-    return NGX_DECLINED;
+    return NGX_DECLINED;                            // 执行成功但未处理
 }
 
